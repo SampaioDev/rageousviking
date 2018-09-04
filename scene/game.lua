@@ -23,7 +23,30 @@ function scene:create( event )
 	local viking = display.newImageRect( "scene/game/img/viking.png", 280, 350 )
 	viking.x = display.contentCenterX
 	viking.y = display.contentCenterY + 80
+	
 
+	local function dragShip( event )
+
+		local viking = event.target
+		local phase = event.phase
+
+		if ( "began" == phase ) then
+			display.currentStage:setFocus( viking )
+			
+			viking.touchOffsetX = event.x - viking.x
+
+		elseif ( "moved" == phase ) then
+
+			viking.x = event.x - viking.touchOffsetX
+
+		elseif ( "ended" == phase or "cancelled" == phase ) then
+
+			display.currentStage:setFocus( nil )
+		end
+
+		return true 
+	end
+	viking:addEventListener( "touch", dragShip )
 end
 
 scene:addEventListener( "create" )
