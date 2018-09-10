@@ -1,32 +1,32 @@
 # Rageous Viking
-  Jogo desenvolvido para cadeira de estágio 1
-# Gênero 
+  2D Game produce on corona sdk for academic training
+## Gênero 
   Hack and Slash
-# Público Alvo
+## Público Alvo
   Fãs de Jogos com muita ação e sangue
-# Objetivo geral
+## Main Goal
+  Kill all the enemies the appears on the screen.
+## Objetivos Específicos
 
-# Objetivos Específicos
-
-# Enredo e personagens
-
-# Personagem principal
+## Story and Characters 
+  You are Ragnar, one of the greatest viking in your time...  
+## Personagem principal
   Ragnar Jotunheim
-# Inimigos
+## Inimigos
   População de diversas nacionalidades e outros vikings
-# Iteração do jogador
+## Iteração do jogador
 
-# Controles
+## Controles
 
-# Diagrama de navegação
+## Diagrama de navegação
+   ![Diagrama](diagram.png)
+## Regras do jogo 
 
-# Regras do jogo 
+## Sistema de Pontuação
 
-# Sistema de Pontuação
+## Sistema de Vidas
 
-# Sistema de Vidas
+## Sistema de Pontos
 
-# Sistema de Pontos
-
-# Como o jogo acaba
+## Como o jogo acaba
   ELE NUNCA ACABA!
