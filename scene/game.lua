@@ -28,6 +28,30 @@ function scene:create( event )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 	
+	local sheetOptions = {width = 100 , height = 60, numFrames =  5}
+	local sheet = graphics.newImageSheet("scene/game/img/viking-atacando.png", sheetOptions)
+	
+	
+	local sequences = {
+		{
+			name = "Running",
+			start = 1,
+			count = 5,
+			time = 1000,
+			loopCount = 0,
+		
+		}
+	}
+	
+	local running = display.newSprite(sheet, sequences)
+	running.x = display.contentCenterX
+	running.y = display.contentCenterY + 100
+	running.xScale = 1.2
+	running.yScale = 1.2
+	running.height = 500
+	
+	running:play()
+	
 	local viking = display.newImageRect( "scene/game/img/viking.png", 220, 280)
 	viking.x = display.contentCenterX
 	viking.y = display.contentCenterY + 100
