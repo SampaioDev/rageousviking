@@ -7,10 +7,13 @@
 -- Your code here
 
 local composer = require("composer")
-
 local scene = composer.newScene()
-
-local physics = require("physics")
+local score = 0
+local timerCount
+local warriorTable = {}
+local physics = require( "physics" )
+physics.start()
+physics.setGravity( 0, 0 )
 physics.start()
 
  _W = display.contentWidth; -- Get the width of the screen
@@ -28,33 +31,41 @@ function scene:create( event )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 	
-	local sheetOptions = {width = 100 , height = 60, numFrames =  5}
-	local sheet = graphics.newImageSheet("scene/game/img/viking-atacando.png", sheetOptions)
-	
-	
-	local sequences = {
-		{
-			name = "Running",
-			start = 1,
-			count = 5,
-			time = 1000,
-			loopCount = 0,
+	-- local sheetOptions = {
+	-- 	width =  196.33, 
+	-- 	height = 200, 
+	-- 	numFrames = 36
+	-- }
+	-- local sheet = graphics.newImageSheet("scene/game/img/BronzeKnight.png", sheetOptions)
+
+	-- local sequences = {
+	-- 	{
+	-- 		name = "attacking",
+	-- 		start = 22,
+	-- 		count = 30,
+	-- 		time = 1400,
+	-- 		loopCount = 0,
 		
-		}
-	}
+	-- 	}
+	-- }
 	
-	local running = display.newSprite(sheet, sequences)
-	running.x = display.contentCenterX
-	running.y = display.contentCenterY + 100
-	running.xScale = 1.2
-	running.yScale = 1.2
-	running.height = 500
-	
-	running:play()
+	-- local running = display.newSprite(sheet, sequences)
+	-- running.x = display.contentCenterX + 800
+	-- running.y = display.contentCenterY + 130
+	-- running.xScale = 1.2
+	-- running.yScale = 1.2
+	local myText = display.newText( score , 100, 200, native.systemFont, 120 )
+	myText:setFillColor( 1	, 1, 1 )
+	myText.x = display.contentCenterX
+	myText.y = display.contentCenterY - 400
 	
 	local viking = display.newImageRect( "scene/game/img/viking.png", 220, 280)
-	viking.x = display.contentCenterX
-	viking.y = display.contentCenterY + 100
+	viking.x = display.contentCenterX - 820
+	viking.y = display.contentCenterY + 130
+
+	local sword = display.newImageRect( "scene/game/img/sword.png", 200, 220 )
+	sword.x = 1000; 
+	sword.y = 900;
 
 	local left = display.newImageRect( "scene/game/img/arrowL.png", 200, 280 )
 	left.x = -360; left.y = 900;
@@ -85,6 +96,28 @@ function scene:create( event )
 		print( "White square's center position in screen coordinates: ", X, Y )
 	end
 	Runtime:addEventListener("touch", stop )
+
+	local function createWarrior()
+		score = score + 1
+		myText.text = score
+		local newWarrior = display.newImageRect("scene/game/img/viking2.png", 200, 240)
+	   	table.insert( warriorTable, newWarrior)
+	   	physics.addBody( newWarrior, "dynamic", { radius=70, bounce=0.8 } )
+
+	   	local whereFrom = math.random(1)
+
+		    if ( whereFrom == 1 ) then
+				newWarrior.x = display.contentCenterX + 900
+				newWarrior.y = display.contentCenterY + 150
+				newWarrior:setLinearVelocity(-500, 0)
+			end
+	end
+
+	local function loop()
+		createWarrior()
+	end
+
+	sword:addEventListener("tap", createWarrior)
 end
 
 scene:addEventListener( "create" )
