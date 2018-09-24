@@ -24,7 +24,9 @@
    ![Diagrama](diagram.png) 
 
 ## Point System
-
+  The point system is based on how many enemies you've already killed... but let me help you to understand:
+  For each basic warrior that you kill you get 100 points and it drops some amount of gold(from 10 to 200, randomly) that can be used to buy some equipments, like armour and weapons.
+  When it comes to bosses, each one of them that you kill you receive 500 points and it drops between 500 and 100 of gold. 
 ## Life System
   Your have 3 lifes on the beginning whenever you got hit by an enemie you lost 1 of them.
   BUT... if you got hit by the boss you lost  2 lifes.
