@@ -7,7 +7,7 @@
 ## Main Goal
   Kill all the enemies the appears on the screen.
 ## Specified Objectives
-
+  Dodge the enemies if cannot kill them
 ## Story
   You are Ragnar, one of the greatest viking of all time and on this game we are going to show your first travel to conquer Europe... starting with France you and your fellows need to plunder and aniquilate the enemie army. A viking never runs from a good fight, and if you die.
   
