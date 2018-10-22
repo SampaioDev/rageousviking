@@ -11,7 +11,10 @@ local composer = require("composer")
 local scene = composer.newScene()
 
 function scene:create( event )
-	
+	local backgroundMusic = audio.loadStream( "soundtrack/menu.mp3" )
+	local buttonAudio = audio.loadStream( "soundtrack/start-button.mp3")
+	audio.play(backgroundMusic, {channel = 1, loops =-1})
+
 	local background = display.newImageRect( "scene/menu/img/background.jpg", 1900, 1050 )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
@@ -22,6 +25,7 @@ function scene:create( event )
 
 	local function startGame()
 		composer.gotoScene("scene.game")
+		audio.play(buttonAudio)
 	end
 
 	start:addEventListener( "tap", startGame )

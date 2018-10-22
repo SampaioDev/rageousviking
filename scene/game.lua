@@ -8,6 +8,8 @@
 
 local composer = require("composer")
 local scene = composer.newScene()
+local backgroundMusic = audio.loadStream("soundtrack/epic.mp3")
+local steps = audio.loadStream("soundtrack/steps.mp3")
 local textScore
 local score = 0
 local timerCount
@@ -22,6 +24,10 @@ physics.setGravity( 0, 0 )
  speed = 10; -- Set Walking Speed
 
 function scene:create( event )
+	audio.stop(1)
+	audio.pause()
+	audio.play(backgroundMusic)
+	audio.setVolume(0.4, backgroundMusic)
 	
 	local count = 0
 
@@ -81,12 +87,14 @@ function scene:create( event )
 	right:addEventListener("touch",right)
 
 	local function movePlayer (event)
+		audio.play(steps, {channel = 2})
 		viking.x = viking.x + motionx;
 	end
 	Runtime:addEventListener("enterFrame", movePlayer)
 
 	local function stop (event)
 		if event.phase =="ended" then
+			audio.stop(2)
 			motionx = 0;
 		end
 		local X, Y = viking:localToContent( 0, 0 )
