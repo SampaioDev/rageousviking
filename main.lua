@@ -10,6 +10,7 @@ local composer = require("composer")
 
 local isSimulator = "simulator" == system.getInfo( "environment" )
 local isMobile = ( "ios" == system.getInfo("platform") ) or ( "android" == system.getInfo("platform") )
+system.activate( "multitouch" )
 
 -- If we are running in the Corona Simulator, enable debugging keys
 -- "F" key shows a visual monitor of our frame rate and memory usage
