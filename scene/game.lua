@@ -11,6 +11,7 @@ local scene = composer.newScene()
 local backgroundMusic = audio.loadStream("soundtrack/epic.mp3")
 local steps = audio.loadStream("soundtrack/steps.mp3")
 local textScore
+local attacking
 local score = 0
 local warriorTable = {}
 local backgroundGroup = display.newGroup()
@@ -60,17 +61,21 @@ function scene:create( event )
 	textScore.x = display.contentCenterX
 	textScore.y = display.contentCenterY - 450
 	
-	local viking = display.newImageRect( "ui/viking.png", 220, 280)
+	local viking = display.newImageRect( "ui/viking.png", 140, 200)
 	viking.x = display.contentCenterX - 820
-	viking.y = display.contentCenterY + 130
+	viking.y = display.contentCenterY + 160
 	physics.addBody( viking, "static", { radius=70} )
 	viking.name = "viking"
 	mainGroup:insert(viking)
 
-	local sword = display.newImageRect( "ui/sword.png", 200, 220 )
-	sword.x = 1000; 
-	sword.y = 900;
-	uiGroup:insert(sword)
+	local attackButton = display.newImageRect( "ui/sword.png", 200, 220 )
+	attackButton.x = 1000; 
+	attackButton.y = 900;
+	uiGroup:insert(attackButton)
+
+	local function attack()
+		attacking = 1
+	end
 
 	local left = display.newImageRect( "ui/arrowL.png", 200, 280 )
 	left.x = -360; left.y = 900;
@@ -101,7 +106,7 @@ function scene:create( event )
 
 	local function stop (event)
 		if event.phase =="ended" then
-			audio.stop(2)
+			audio.stop(2)			
 			motionx = 0;
 		end
 		local X, Y = viking:localToContent( 0, 0 )
@@ -109,13 +114,12 @@ function scene:create( event )
 	Runtime:addEventListener("touch", stop )
 
 	local function onCollision( event )
-		print(event.target.name)
+		print(event.other.name)
 		if ( event.phase == "began" ) then			
 			if (event.other.name == "viking") then
 				score = score + 100
 				textScore.text = "Score: " .. score
 				event.target:removeSelf()
-				event.other:removeSelf()
 			end
 		end
 	end	
@@ -129,7 +133,7 @@ function scene:create( event )
 		newWarrior.yScale = 1.1
 		table.insert( warriorTable, newWarrior)
 		physics.addBody( newWarrior, "dynamic", { radius=70} )
-		newWarrior.Name = "newWarrior"
+		newWarrior.name = "newWarrior"
 		newWarrior:addEventListener( "collision", onCollision )
 		
 		local whereFrom = math.random(1)
@@ -150,7 +154,7 @@ function scene:hide( event )
 	if ( phase == "will" ) then
 		audio.pause()
 	elseif ( phase == "did" ) then
- 	
+		
 	end
 end
 
