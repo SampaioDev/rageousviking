@@ -1,11 +1,3 @@
------------------------------------------------------------------------------------------
---
--- main.lua
---
------------------------------------------------------------------------------------------
-
--- Your code here
-
 local composer = require("composer")
 local scene = composer.newScene()
 local menugroup = display.newGroup()
@@ -21,12 +13,22 @@ function scene:create( event )
 	menugroup:insert(background)
 
 	local voltar = display.newImageRect( "ui/voltar.png", 600, 280 )
-	voltar.x = display.contentCenterX
+	voltar.x = display.contentCenterX + 300
 	voltar.y = display.contentCenterY + 200 
     menugroup:insert(voltar)
 
-    local function goToMenu()
-        composer.goToScene("scene.menu")
+	local jogar = display.newImageRect( "ui/start-button.png", 560, 135 )
+	jogar.x = display.contentCenterX - 300
+	jogar.y = display.contentCenterY + 265
+    menugroup:insert(jogar)
+
+    local function playAgain()
+        composer.gotoScene("scene.game")
+    end
+    jogar:addEventListener( "tap", playAgain)
+
+	local function goToMenu()
+        composer.gotoScene("scene.menu")
     end
     voltar:addEventListener( "tap", goToMenu)
 
@@ -47,7 +49,7 @@ function scene:create( event )
 		else
 			sound = display.newImageRect( "ui/soundon.png", 100, 100 )
 			sound.x = display.contentCenterX + 800
-			sound.y = display.contentCenterY - 380
+			sound.y = display.contentCenterY - 420
 			audio.resume()
 			status = "ON"	
 		end	
@@ -64,6 +66,17 @@ function scene:hide( event )
 		audio.stop(1)
 		display.remove(menugroup)
 		--audio.pause()
+	elseif ( phase == "did" ) then
+ 	
+	end
+end
+
+function scene:hide( event )
+	local sceneGroup = self.view
+	local phase = event.phase
+ 
+	if ( phase == "will" ) then
+
 	elseif ( phase == "did" ) then
  	
 	end

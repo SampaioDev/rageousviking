@@ -36,4 +36,4 @@ if isSimulator then
 	Runtime:addEventListener( "key", debugKeys )
 end
 
-composer.gotoScene("scene.game-over")
+composer.gotoScene("scene.menu")

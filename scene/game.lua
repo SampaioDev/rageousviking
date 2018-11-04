@@ -1,11 +1,3 @@
------------------------------------------------------------------------------------------
---
--- main.lua
---
------------------------------------------------------------------------------------------
-
--- Your code here
-
 local composer = require("composer")
 local scene = composer.newScene()
 local backgroundMusic = audio.loadStream("soundtrack/epic.mp3")
@@ -14,6 +6,7 @@ local textScore
 local attacking
 local score = 0
 local warriorTable = {}
+local lifes = 3
 local backgroundGroup = display.newGroup()
 local mainGroup = display.newGroup()
 local uiGroup = display.newGroup()
@@ -50,7 +43,7 @@ function scene:create( event )
 			start = 3,
 			count = 25,
 			time = 800,
-			loopCount = 0,
+			loopCount = 0,	
 			speed = speed - 20
 			
 		}
@@ -136,6 +129,7 @@ function scene:create( event )
 	local function attack()
 		attacking = 1
 	end
+	attackButton:addEventListener( "tap", attack)
 
 	local left = display.newImageRect( "ui/arrowL.png", 220, 220 )
 	left.x = -360; left.y = 880;
@@ -162,14 +156,13 @@ function scene:create( event )
 	local function movePlayer (event)
 		viking.x = viking.x + motionx;	
 	end
-	Runtime:addEventListener("enterFrame", movePlayer)
+	movePlayerLoop = timer.performWithDelay(1, movePlayer, -1)
 
 	local function stop (event)
 		if event.phase =="ended" then
 			audio.stop(2)			
 			motionx = 0;
 		end
-		local X, Y = viking:localToContent( 0, 0 )
 	end
 	Runtime:addEventListener("touch", stop )
 
@@ -177,9 +170,13 @@ function scene:create( event )
 		print(event.other.name)
 		if ( event.phase == "began" ) then			
 			if (event.other.name == "viking") then
+				lifes = lifes -1
 				score = score + 100
 				textScore.text = "Score: " .. score
 				event.target:removeSelf()
+				if(lifes <= 0) then
+					composer.gotoScene("scene.game-over")	
+				end
 			end
 		end
 	end	
@@ -212,6 +209,12 @@ function scene:hide( event )
  
 	if ( phase == "will" ) then
 		audio.pause()
+		timer.cancel(criarInimigoLoop)
+		timer.cancel(movePlayerLoop)
+		Runtime:removeEventListener("touch", stop )
+		display.remove(backgroundGroup)
+		display.remove(uiGroup)
+		display.remove(mainGroup)
 	elseif ( phase == "did" ) then
 		
 	end
