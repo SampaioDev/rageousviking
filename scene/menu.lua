@@ -9,7 +9,6 @@
 local composer = require("composer")
 local scene = composer.newScene()
 local menugroup = display.newGroup()
-local moveWaves
 
 function scene:create( event )
 	local backgroundMusic = audio.loadStream( "soundtrack/menu.mp3" )
@@ -57,9 +56,32 @@ function scene:create( event )
 	start.y = display.contentCenterY + 380
 	menugroup:insert(start)
 
+	local sound = display.newImageRect( "ui/soundon.png", 100, 100 )
+	sound.x = display.contentCenterX + 800
+	sound.y = display.contentCenterY - 380
+	menugroup:insert(sound)
+
+	
+	local status = "ON"
+	local function toggleSound()
+		if(status == "ON") then
+			sound = display.newImageRect( "ui/soundoff.png", 100, 100 )
+			sound.x = display.contentCenterX + 800
+			sound.y = display.contentCenterY - 380
+			audio.pause()
+			status = "OFF"	
+		else
+			sound = display.newImageRect( "ui/soundon.png", 100, 100 )
+			sound.x = display.contentCenterX + 800
+			sound.y = display.contentCenterY - 380
+			audio.resume()
+			status = "ON"	
+		end	
+	end
+	sound:addEventListener( "tap", toggleSound)
+
 	local contador = 0 
 	local function moveWaves()
-		print(contador)
 		if(contador >=  0 and contador < 5) then
 			wave2.y = wave2.y + 4
 			wave1.y = wave1.y - 1
@@ -80,7 +102,20 @@ function scene:create( event )
 		end
 		end
 	end
-	moveWaves = timer.performWithDelay(80, moveWaves, -1)
+	moveWavesLoop = timer.performWithDelay(80, moveWaves, -1)
+
+	local function buttonPulse()
+		if(contador >=  0 and contador < 5) then
+			start.xScale = 1.1
+			start.yScale = 1.1
+		else if(contador >=  5) then
+			start.xScale = 1
+			start.yScale = 1
+		end
+		end
+	end
+
+	buttonPulseLoop = timer.performWithDelay(20, buttonPulse, -1)
 
 	local function startGame()
 		composer.gotoScene("scene.game")
@@ -95,7 +130,7 @@ function scene:hide( event )
  
 	if ( phase == "will" ) then
 		audio.stop(1)
-		timer.cancel(moveWaves)
+		timer.cancel(moveWavesLoop)
 		display.remove(menugroup)
 		--audio.pause()
 	elseif ( phase == "did" ) then
@@ -108,4 +143,4 @@ scene:addEventListener( "create" )
 scene:addEventListener( "hide" )
 --scene:addEventListener( "destroy" )
 
-return scenea
+return scene

@@ -29,21 +29,21 @@ system.activate( "multitouch" )
 
 function scene:create( event )
 	audio.play(backgroundMusic, {channel = 3, loops =-1})
-	audio.setVolume( 0.1, { channel = 3 } )
+	audio.setVolume( 0.5, { channel = 3 } )
 	
 	local count = 0
 
-	local background = display.newImageRect( "ui/background.png", 2600, 1100 )
+	local background = display.newImageRect( "ui/background-game.png", 2000, 1050 )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 	backgroundGroup:insert(background)
 	
-	local sheetOptions = {
+	local sheetOptions1 = {
 		width =  196.33, 
 		height = 200, 
 		numFrames = 36
 	}
-	local sheet = graphics.newImageSheet("ui/BronzeKnight.png", sheetOptions)
+	local sheet = graphics.newImageSheet("ui/BronzeKnight.png", sheetOptions1)
 	local sequences = {
 		{
 			name = "attacking",
@@ -55,6 +55,38 @@ function scene:create( event )
 			
 		}
 	}
+
+	local sheetOptions2 = {
+		width =  144, 
+		height = 161, 
+		numFrames = 5
+	}
+
+	local vikingSheet = graphics.newImageSheet("ui/viking-sheet.png", sheetOptions2)
+	local sequences2 = {
+		{
+			name = "idle",
+			start = 1,
+			count = 1,
+			loopCount = 0
+		},
+		{
+			name = "attacking",
+			start = 1,
+			count = 5,
+			time = 500,
+			loopCount = 0,
+			speed = speed - 20
+		}
+	}
+	local vikingAtack = display.newSprite(vikingSheet, sequences2)
+	vikingAtack.x = display.contentCenterX
+	vikingAtack.y = display.contentCenterY
+	vikingAtack.xScale = 1.4
+	vikingAtack.yScale = 1.4
+	vikingAtack:setSequence("attacking")
+	vikingAtack:play()
+
 
 	textScore = display.newText("Score:" ..score , 100, 200, native.systemFont, 100 )
 	textScore:setFillColor( 1	, 1, 1 )
@@ -68,21 +100,49 @@ function scene:create( event )
 	viking.name = "viking"
 	mainGroup:insert(viking)
 
-	local attackButton = display.newImageRect( "ui/sword.png", 200, 220 )
-	attackButton.x = 1000; 
-	attackButton.y = 900;
+	local attackButton = display.newImageRect( "ui/attack-button.png", 200, 220 )
+	attackButton.x = 1100; 
+	attackButton.y = 880;
 	uiGroup:insert(attackButton)
+
+	local pause = display.newImageRect( "ui/pause.png", 100, 100 )
+	pause.x = display.contentCenterX + 800
+	pause.y = display.contentCenterY - 420
+	uiGroup:insert(pause)
+
+	local sound = display.newImageRect( "ui/soundon.png", 100, 100 )
+	sound.x = display.contentCenterX - 800
+	sound.y = display.contentCenterY - 420
+	uiGroup:insert(sound)
+
+	local status = "ON"
+	local function toggleSound()
+		if(status == "ON") then
+			sound = display.newImageRect( "ui/soundoff.png", 100, 100 )
+			sound.x = display.contentCenterX - 800
+			sound.y = display.contentCenterY - 420
+			audio.pause()
+			status = "OFF"	
+		else
+			sound = display.newImageRect( "ui/soundon.png", 100, 100 )
+			sound.x = display.contentCenterX - 800
+			sound.y = display.contentCenterY - 420
+			audio.resume()
+			status = "ON"	
+		end	
+	end
+	sound:addEventListener( "tap", toggleSound)
 
 	local function attack()
 		attacking = 1
 	end
 
-	local left = display.newImageRect( "ui/arrowL.png", 200, 280 )
-	left.x = -360; left.y = 900;
+	local left = display.newImageRect( "ui/arrowL.png", 220, 220 )
+	left.x = -360; left.y = 880;
 	uiGroup:insert(left)
 
-	local right = display.newImageRect( "ui/arrowR.png", 200, 280 )
-	right.x = _W - 900; right.y = 900;
+	local right = display.newImageRect( "ui/arrowR.png", 220, 220 )
+	right.x = _W - 840; right.y = 880;
 	uiGroup:insert(right)
 
 	function left:touch()
@@ -143,8 +203,7 @@ function scene:create( event )
 		end
 	end
 	criarInimigoLoop = timer.performWithDelay(1000, createWarrior, -1)
-	
-	
+		
 end
 
 function scene:hide( event )
