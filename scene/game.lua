@@ -65,31 +65,27 @@ function scene:create( event )
 		},
 		{
 			name = "attacking",
-			start = 1,
-			count = 5,
-			time = 500,
+			start = 2,
+			count = 4,
+			time = 200,
 			loopCount = 0,
 			speed = speed - 20
 		}
 	}
-	local vikingAtack = display.newSprite(vikingSheet, sequences2)
-	vikingAtack.x = display.contentCenterX
-	vikingAtack.y = display.contentCenterY
-	vikingAtack.xScale = 1.4
-	vikingAtack.yScale = 1.4
-	vikingAtack:setSequence("attacking")
-	vikingAtack:play()
-
-
 	textScore = display.newText("Score:" ..score , 100, 200, native.systemFont, 100 )
 	textScore:setFillColor( 1	, 1, 1 )
 	textScore.x = display.contentCenterX
 	textScore.y = display.contentCenterY - 450
-	
-	local viking = display.newImageRect( "ui/viking.png", 140, 200)
-	viking.x = display.contentCenterX - 820
+	uiGroup:insert(textScore)
+
+	local viking = display.newSprite(vikingSheet, sequences2)
+	viking.x = display.contentCenterX - 800
 	viking.y = display.contentCenterY + 160
 	physics.addBody( viking, "static", { radius=70} )
+	viking.xScale = 1.4
+	viking.yScale = 1.4
+	viking:setSequence("idle")
+	viking:play()
 	viking.name = "viking"
 	mainGroup:insert(viking)
 
@@ -98,36 +94,73 @@ function scene:create( event )
 	attackButton.y = 880;
 	uiGroup:insert(attackButton)
 
+	life = display.newImageRect( "ui/3-lifes.png", 370, 130 )
+	life.x = display.contentCenterX - 700
+	life.y = display.contentCenterY - 420
+	uiGroup:insert(life)
+
 	local pause = display.newImageRect( "ui/pause.png", 100, 100 )
 	pause.x = display.contentCenterX + 800
 	pause.y = display.contentCenterY - 420
 	uiGroup:insert(pause)
 
 	local sound = display.newImageRect( "ui/soundon.png", 100, 100 )
-	sound.x = display.contentCenterX - 800
-	sound.y = display.contentCenterY - 420
+	sound.x = display.contentCenterX + 800
+	sound.y = display.contentCenterY - 300
 	uiGroup:insert(sound)
 
 	local status = "ON"
 	local function toggleSound()
 		if(status == "ON") then
 			sound = display.newImageRect( "ui/soundoff.png", 100, 100 )
-			sound.x = display.contentCenterX - 800
-			sound.y = display.contentCenterY - 420
+			sound.x = display.contentCenterX + 800
+			sound.y = display.contentCenterY - 300
 			audio.pause()
 			status = "OFF"	
 		else
 			sound = display.newImageRect( "ui/soundon.png", 100, 100 )
-			sound.x = display.contentCenterX - 800
-			sound.y = display.contentCenterY - 420
+			sound.x = display.contentCenterX + 800
+			sound.y = display.contentCenterY - 300
 			audio.resume()
 			status = "ON"	
 		end	
 	end
 	sound:addEventListener( "tap", toggleSound)
 
+	local function stopAttack()
+		attacking = 0
+		local playerx = viking.x
+		local playery = viking.y
+		viking:removeSelf()
+		viking = display.newSprite(vikingSheet, sequences2)
+		viking.x = playerx
+		viking.y = playery
+		physics.addBody( viking, "static", { radius=70} )
+		viking.xScale = 1.4
+		viking.yScale = 1.4
+		viking:setSequence("idle")
+		viking:play()
+		viking.name = "viking"
+		mainGroup:insert(viking)
+		physics.addBody(viking, "static", { radius=70} )
+	end
+
 	local function attack()
 		attacking = 1
+		local playerx = viking.x
+		local playery = viking.y
+		viking:removeSelf()
+		viking = display.newSprite(vikingSheet, sequences2)
+		viking.x = playerx
+		viking.y = playery
+		physics.addBody( viking, "static", { radius=70} )
+		viking.xScale = 1.4
+		viking.yScale = 1.4
+		viking:setSequence("attacking")
+		viking:play()
+		viking.name = "viking"
+		mainGroup:insert(viking)
+		stopAtk = timer.performWithDelay(500, stopAttack)
 	end
 	attackButton:addEventListener( "tap", attack)
 
@@ -170,11 +203,31 @@ function scene:create( event )
 		print(event.other.name)
 		if ( event.phase == "began" ) then			
 			if (event.other.name == "viking") then
-				lifes = lifes -1
-				score = score + 100
-				textScore.text = "Score: " .. score
-				event.target:removeSelf()
+				if(attacking == 1) then
+					score = score + 100
+					textScore.text = "Score: " .. score
+					event.target:removeSelf()
+				else	
+					event.target:removeSelf()
+					lifes = lifes -1
+					if(lifes < 2) then
+						life = display.newImageRect( "ui/1-life.png", 370, 130 )
+						life.x = display.contentCenterX - 700
+						life.y = display.contentCenterY - 420
+						uiGroup:insert(life)
+					else if(lifes < 3) then
+						life = display.newImageRect( "ui/2-lifes.png", 370, 130 )
+						life.x = display.contentCenterX - 700
+						life.y = display.contentCenterY - 420
+						uiGroup:insert(life)
+					end
+					end
+				end
 				if(lifes <= 0) then
+					life = display.newImageRect( "ui/0-life.png", 370, 130 )
+					life.x = display.contentCenterX - 700
+					life.y = display.contentCenterY - 420
+					uiGroup:insert(life)
 					composer.gotoScene("scene.game-over")	
 				end
 			end
@@ -199,7 +252,7 @@ function scene:create( event )
 			newWarrior:setLinearVelocity(-350, 0)
 		end
 	end
-	criarInimigoLoop = timer.performWithDelay(1000, createWarrior, -1)
+	criarInimigoLoop = timer.performWithDelay(1200, createWarrior, -1)
 		
 end
 
@@ -215,15 +268,40 @@ function scene:hide( event )
 		display.remove(backgroundGroup)
 		display.remove(uiGroup)
 		display.remove(mainGroup)
+		composer.removeScene("game")
 	elseif ( phase == "did" ) then
 		
 	end
 end
 
+function scene:show( event )
+
+	local sceneGroup = self.view
+	local phase = event.phase
+ 
+	if ( phase == "will" ) then
+		composer.removeScene("scene.menu")
+		composer.removeScene("scene.game-over")
+		-- Code here runs when the scene is still off screen (but is about to come on screen)
+ 
+	elseif ( phase == "did" ) then
+		-- Code here runs when the scene is entirely on screen
+ 
+	end
+end
+
+-- destroy()
+function scene:destroy( event )
+
+	local sceneGroup = self.view
+	-- Code here runs prior to the removal of scene's view
+ 
+end
+
 
 scene:addEventListener( "create" )
--- scene:addEventListener( "show" )
+scene:addEventListener( "show" )
 scene:addEventListener( "hide" )
--- scene:addEventListener( "destroy" )
+scene:addEventListener( "destroy" )
 
 return scene

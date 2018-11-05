@@ -3,15 +3,15 @@ local scene = composer.newScene()
 local menugroup = display.newGroup()
 
 function scene:create( event )
-	local backgroundMusic = audio.loadStream( "soundtrack/menu.mp3" )
-	local buttonAudio = audio.loadStream( "soundtrack/start-button.mp3")
+	local backgroundMusic = audio.loadStream( "soundtrack/menu.wav" )
+	local buttonAudio = audio.loadStream( "soundtrack/rage.mp3")
 	audio.play(backgroundMusic, {channel = 1, loops =-1})
+	
 	
 	local background = display.newImageRect( "ui/background.png", 1900, 1050 )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 	menugroup:insert(background)
-	
 	
 	local wave1 = display.newImageRect( "ui/onda2.png", 1900, 300)
 	wave1.x = display.contentCenterX
@@ -126,13 +126,37 @@ function scene:hide( event )
 		display.remove(menugroup)
 		--audio.pause()
 	elseif ( phase == "did" ) then
- 	
+		
 	end
 end
 
+function scene:show( event )
+
+	local sceneGroup = self.view
+	local phase = event.phase
+ 
+	if ( phase == "will" ) then
+		composer.removeScene("scene.game-over")
+		composer.removeScene("scene.game")
+		-- Code here runs when the scene is still off screen (but is about to come on screen)
+ 
+	elseif ( phase == "did" ) then
+		-- Code here runs when the scene is entirely on screen
+ 
+	end
+end
+
+-- destroy()
+function scene:destroy( event )
+
+	local sceneGroup = self.view
+	-- Code here runs prior to the removal of scene's view
+ 
+ end
+
 scene:addEventListener( "create" )
--- scene:addEventListener( "show" )
+scene:addEventListener( "show" )
 scene:addEventListener( "hide" )
---scene:addEventListener( "destroy" )
+scene:addEventListener( "destroy" )
 
 return scene

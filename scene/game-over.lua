@@ -1,6 +1,6 @@
 local composer = require("composer")
 local scene = composer.newScene()
-local menugroup = display.newGroup()
+local mainGroup = display.newGroup()
 
 function scene:create( event )
 	local backgroundMusic = audio.loadStream( "soundtrack/menu.mp3" )
@@ -10,17 +10,17 @@ function scene:create( event )
 	local background = display.newImageRect( "ui/game-over.png", 1900, 1050 )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
-	menugroup:insert(background)
+	mainGroup:insert(background)
 
 	local voltar = display.newImageRect( "ui/voltar.png", 600, 280 )
 	voltar.x = display.contentCenterX + 300
 	voltar.y = display.contentCenterY + 200 
-    menugroup:insert(voltar)
+    mainGroup:insert(voltar)
 
 	local jogar = display.newImageRect( "ui/start-button.png", 560, 135 )
 	jogar.x = display.contentCenterX - 300
 	jogar.y = display.contentCenterY + 265
-    menugroup:insert(jogar)
+    mainGroup:insert(jogar)
 
     local function playAgain()
         composer.gotoScene("scene.game")
@@ -35,7 +35,7 @@ function scene:create( event )
 	local sound = display.newImageRect( "ui/soundon.png", 100, 100 )
 	sound.x = display.contentCenterX + 800
 	sound.y = display.contentCenterY - 420
-	menugroup:insert(sound)
+	mainGroup:insert(sound)
 
 	
 	local status = "ON"
@@ -64,27 +64,41 @@ function scene:hide( event )
  
 	if ( phase == "will" ) then
 		audio.stop(1)
-		display.remove(menugroup)
+		display.remove(mainGroup)
 		--audio.pause()
 	elseif ( phase == "did" ) then
  	
 	end
 end
 
-function scene:hide( event )
+
+function scene:show( event )
+
 	local sceneGroup = self.view
 	local phase = event.phase
  
 	if ( phase == "will" ) then
-
+		composer.removeScene("scene.game")
+		composer.removeScene("scene.menu")
+		-- Code here runs when the scene is still off screen (but is about to come on screen)
+ 
 	elseif ( phase == "did" ) then
- 	
+		-- Code here runs when the scene is entirely on screen
+ 
 	end
 end
 
+-- destroy()
+function scene:destroy( event )
+
+	local sceneGroup = self.view
+	-- Code here runs prior to the removal of scene's view
+ 
+end
+
 scene:addEventListener( "create" )
--- scene:addEventListener( "show" )
+scene:addEventListener( "show" )
 scene:addEventListener( "hide" )
---scene:addEventListener( "destroy" )
+scene:addEventListener( "destroy" )
 
 return scene
