@@ -6,13 +6,16 @@ local textScore
 local attacking
 local score = 0
 local warriorTable = {}
+local arrowTable = {}
 local lifes = 3
 local backgroundGroup = display.newGroup()
 local mainGroup = display.newGroup()
 local uiGroup = display.newGroup()
 local physics = require( "physics" )
+physics.setDrawMode("hybrid")
 physics.start()
 physics.setGravity( 0, 0 )
+local collisionFilter1 = {groupIndex = -1}
 
 _W = display.contentWidth; -- Get the width of the screen
 _H = display.contentHeight; -- Get the height of the screen
@@ -26,11 +29,19 @@ function scene:create( event )
 	
 	local count = 0
 
+	local leftBlock = display.newRect(-530, 700, 5, 200)
+	physics.addBody(leftBlock, "static",{density = 3.0 , filter = collisionFilter1})
+	backgroundGroup:insert(leftBlock)
+
+	local rightBlock = display.newRect(1280, 700, 5, 200)
+	physics.addBody(rightBlock, "static",{density = 3.0 , filter = collisionFilter1})
+	backgroundGroup:insert(rightBlock)
+
 	local background = display.newImageRect( "ui/background-game.png", 2000, 1050 )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 	backgroundGroup:insert(background)
-	
+
 	local sheetOptions1 = {
 		width =  196.33, 
 		height = 200, 
@@ -77,11 +88,11 @@ function scene:create( event )
 	textScore.x = display.contentCenterX
 	textScore.y = display.contentCenterY - 450
 	uiGroup:insert(textScore)
-
+	
 	local viking = display.newSprite(vikingSheet, sequences2)
 	viking.x = display.contentCenterX - 800
 	viking.y = display.contentCenterY + 160
-	physics.addBody( viking, "static", { radius=70} )
+	physics.addBody( viking, "dynamic", { density = 3.0 } )
 	viking.xScale = 1.4
 	viking.yScale = 1.4
 	viking:setSequence("idle")
@@ -242,9 +253,10 @@ function scene:create( event )
 		newWarrior.xScale = 1.1
 		newWarrior.yScale = 1.1
 		table.insert( warriorTable, newWarrior)
-		physics.addBody( newWarrior, "dynamic", { radius=70} )
+		physics.addBody( newWarrior, "dynamic", { radius=70, filter = collisionFilter1} )
 		newWarrior.name = "newWarrior"
 		newWarrior:addEventListener( "collision", onCollision )
+		mainGroup:insert(newWarrior)
 		
 		local whereFrom = math.random(1)
 		
@@ -253,6 +265,26 @@ function scene:create( event )
 		end
 	end
 	criarInimigoLoop = timer.performWithDelay(1200, createWarrior, -1)
+
+	local function createArrow()
+		if(score >= 1000) then
+			local flecha = display.newImageRect("ui/flecha.png", 30, 140)
+			flecha.x = math.random(2200)  
+			flecha.y = display.contentCenterY - 440
+			flecha.name = "flecha" 
+			mainGroup:insert(flecha)
+			table.insert( arrowTable, flecha)
+			physics.addBody( flecha, "dynamic", {filter = collisionFilter1} )
+			flecha:addEventListener( "collision", onCollision )
+			
+			local whereFrom = math.random(1)
+			
+			if ( whereFrom == 1 ) then
+				flecha:setLinearVelocity(0, 400)
+			end
+		end
+	end
+	createArrowLoop = timer.performWithDelay(400, createArrow, -1)
 		
 end
 
@@ -264,6 +296,7 @@ function scene:hide( event )
 		audio.pause()
 		timer.cancel(criarInimigoLoop)
 		timer.cancel(movePlayerLoop)
+		timer.cancel(createArrowLoop)
 		Runtime:removeEventListener("touch", stop )
 		display.remove(backgroundGroup)
 		display.remove(uiGroup)
