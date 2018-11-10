@@ -12,7 +12,7 @@ local backgroundGroup = display.newGroup()
 local mainGroup = display.newGroup()
 local uiGroup = display.newGroup()
 local physics = require( "physics" )
-physics.setDrawMode("hybrid")
+--physics.setDrawMode("hybrid")
 physics.start()
 physics.setGravity( 0, 0 )
 local collisionFilter1 = {groupIndex = -1}
