@@ -12,6 +12,7 @@ local backgroundGroup = display.newGroup()
 local mainGroup = display.newGroup()
 local uiGroup = display.newGroup()
 local physics = require( "physics" )
+local position = "R"
 --physics.setDrawMode("hybrid")
 physics.start()
 physics.setGravity( 0, 0 )
@@ -139,39 +140,77 @@ function scene:create( event )
 	sound:addEventListener( "tap", toggleSound)
 
 	local function stopAttack()
-		attacking = 0
-		local playerx = viking.x
-		local playery = viking.y
-		viking:removeSelf()
-		viking = display.newSprite(vikingSheet, sequences2)
-		viking.x = playerx
-		viking.y = playery
-		physics.addBody( viking, "static", { radius=70} )
-		viking.xScale = 1.4
-		viking.yScale = 1.4
-		viking:setSequence("idle")
-		viking:play()
-		viking.name = "viking"
-		mainGroup:insert(viking)
-		physics.addBody(viking, "static", { radius=70} )
+		if(position == "R") then
+			attacking = 0
+			local playerx = viking.x
+			local playery = viking.y
+			viking:removeSelf()
+			viking = display.newSprite(vikingSheet, sequences2)
+			viking.x = playerx
+			viking.y = playery
+			physics.addBody( viking, "static", { radius=70} )
+			viking.xScale = 1.4
+			viking.yScale = 1.4
+			viking:setSequence("idle")
+			viking:play()
+			viking.name = "viking"
+			mainGroup:insert(viking)
+			physics.addBody(viking, "static", { radius=70} )
+		else if(position == "L") then
+			attacking = 0
+			local playerx = viking.x
+			local playery = viking.y
+			viking:removeSelf()
+			viking = display.newSprite(vikingSheet, sequences2)
+			viking.x = playerx
+			viking.y = playery
+			physics.addBody( viking, "static", { radius=70} )
+			viking.xScale = -1.4
+			viking.yScale = 1.4
+			viking:setSequence("idle")
+			viking:play()
+			viking.name = "viking"
+			mainGroup:insert(viking)
+			physics.addBody(viking, "static", { radius=70} )
+		end
+		end
 	end
 
 	local function attack()
-		attacking = 1
-		local playerx = viking.x
-		local playery = viking.y
-		viking:removeSelf()
-		viking = display.newSprite(vikingSheet, sequences2)
-		viking.x = playerx
-		viking.y = playery
-		physics.addBody( viking, "static", { radius=70} )
-		viking.xScale = 1.4
-		viking.yScale = 1.4
-		viking:setSequence("attacking")
-		viking:play()
-		viking.name = "viking"
-		mainGroup:insert(viking)
-		stopAtk = timer.performWithDelay(500, stopAttack)
+		if(position == "R") then
+			attacking = 1
+			local playerx = viking.x
+			local playery = viking.y
+			viking:removeSelf()
+			viking = display.newSprite(vikingSheet, sequences2)
+			viking.x = playerx
+			viking.y = playery
+			physics.addBody( viking, "static", { radius=70} )
+			viking.xScale = 1.4
+			viking.yScale = 1.4
+			viking:setSequence("attacking")
+			viking:play()
+			viking.name = "viking"
+			mainGroup:insert(viking)
+			stopAtk = timer.performWithDelay(500, stopAttack)
+		else if(position == "L") then
+			attacking = 1
+			local playerx = viking.x
+			local playery = viking.y
+			viking:removeSelf()
+			viking = display.newSprite(vikingSheet, sequences2)
+			viking.x = playerx
+			viking.y = playery
+			physics.addBody( viking, "static", { radius=70} )
+			viking.xScale = -1.4
+			viking.yScale = 1.4
+			viking:setSequence("attacking")
+			viking:play()
+			viking.name = "viking"
+			mainGroup:insert(viking)
+			stopAtk = timer.performWithDelay(500, stopAttack)
+		end
+		end	
 	end
 	attackButton:addEventListener( "tap", attack)
 
@@ -184,6 +223,19 @@ function scene:create( event )
 	uiGroup:insert(right)
 
 	function left:touch()
+		position = "L"
+		local playerx = viking.x
+		local playery = viking.y
+		viking:removeSelf()
+		viking = display.newSprite(vikingSheet, sequences2)
+		viking.x = playerx
+		viking.y = playery
+		physics.addBody( viking, "static", { radius=70} )
+		viking.xScale = -1.4
+		viking.yScale = 1.4
+		viking:setSequence("idle")
+		viking:play()
+		viking.name = "viking"
 		audio.play(steps, {channel = 2, loops =-1})
 		audio.setVolume(1, {channel = 2})
 		motionx = -speed;
@@ -191,6 +243,19 @@ function scene:create( event )
 	left:addEventListener("touch",left)
 
 	function right:touch()
+		position = "R"
+		local playerx = viking.x
+		local playery = viking.y
+		viking:removeSelf()
+		viking = display.newSprite(vikingSheet, sequences2)
+		viking.x = playerx
+		viking.y = playery
+		physics.addBody( viking, "static", { radius=70} )
+		viking.xScale = 1.4
+		viking.yScale = 1.4
+		viking:setSequence("idle")
+		viking:play()
+		viking.name = "viking"
 		audio.play(steps, {channel = 2, loops =-1})
 		audio.setVolume(1, {channel = 2})
 		motionx = speed;
@@ -213,8 +278,8 @@ function scene:create( event )
 	local function onCollision( event )
 		print(event.other.name)
 		if ( event.phase == "began" ) then			
-			if (event.other.name == "viking") then
-				if(attacking == 1) then
+			if (event.other.name == "viking" and event.target.name == "newWarrior" or event.other.name == "viking" and event.target.name == "flecha") then
+				if(attacking == 1 and event.target.name == "newWarrior") then
 					score = score + 100
 					textScore.text = "Score: " .. score
 					event.target:removeSelf()
@@ -249,7 +314,7 @@ function scene:create( event )
 		local newWarrior = display.newSprite(sheet, sequences)
 		newWarrior:play()
 		newWarrior.x = display.contentCenterX + 900
-		newWarrior.y = display.contentCenterY + 150
+		newWarrior.y = display.contentCenterY + 180
 		newWarrior.xScale = 1.1
 		newWarrior.yScale = 1.1
 		table.insert( warriorTable, newWarrior)
@@ -266,10 +331,33 @@ function scene:create( event )
 	end
 	criarInimigoLoop = timer.performWithDelay(1200, createWarrior, -1)
 
+	local function createWarrior2()
+		if(score >= 3000) then 
+			local newWarrior2 = display.newSprite(sheet, sequences)
+			newWarrior2:play()
+			newWarrior2.x = display.contentCenterX - 900
+			newWarrior2.y = display.contentCenterY + 180
+			newWarrior2.xScale = -1.1
+			newWarrior2.yScale = 1.1
+			table.insert( warriorTable, newWarrior2)
+			physics.addBody( newWarrior2, "dynamic", { radius=70, filter = collisionFilter1} )
+			newWarrior2.name = "newWarrior2"
+			newWarrior2:addEventListener( "collision", onCollision )
+			mainGroup:insert(newWarrior2)
+			
+			local whereFrom = math.random(1)
+			
+			if ( whereFrom == 1 ) then
+				newWarrior2:setLinearVelocity(250, 0)
+			end
+		end
+	end
+	criarInimigoLoop2 = timer.performWithDelay(1800, createWarrior2, -1)
+
 	local function createArrow()
 		if(score >= 1000) then
 			local flecha = display.newImageRect("ui/flecha.png", 30, 140)
-			flecha.x = math.random(2200)  
+			flecha.x = math.random(_W)  
 			flecha.y = display.contentCenterY - 440
 			flecha.name = "flecha" 
 			mainGroup:insert(flecha)
@@ -295,6 +383,7 @@ function scene:hide( event )
 	if ( phase == "will" ) then
 		audio.pause()
 		timer.cancel(criarInimigoLoop)
+		timer.cancel(criarInimigoLoop2)
 		timer.cancel(movePlayerLoop)
 		timer.cancel(createArrowLoop)
 		Runtime:removeEventListener("touch", stop )
