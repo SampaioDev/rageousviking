@@ -30,7 +30,7 @@ function scene:create( event )
 	
 	local count = 0
 
-	local leftBlock = display.newRect(-530, 700, 5, 200)
+	local leftBlock = display.newRect(-550, 700, 5, 200)
 	physics.addBody(leftBlock, "static",{density = 3.0 , filter = collisionFilter1})
 	backgroundGroup:insert(leftBlock)
 
@@ -192,7 +192,7 @@ function scene:create( event )
 			viking:play()
 			viking.name = "viking"
 			mainGroup:insert(viking)
-			stopAtk = timer.performWithDelay(500, stopAttack)
+			stopAtk = timer.performWithDelay(300, stopAttack)
 		else if(position == "L") then
 			attacking = 1
 			local playerx = viking.x
@@ -208,7 +208,7 @@ function scene:create( event )
 			viking:play()
 			viking.name = "viking"
 			mainGroup:insert(viking)
-			stopAtk = timer.performWithDelay(500, stopAttack)
+			stopAtk = timer.performWithDelay(300, stopAttack)
 		end
 		end	
 	end
@@ -279,7 +279,35 @@ function scene:create( event )
 		print(event.other.name)
 		if ( event.phase == "began" ) then			
 			if (event.other.name == "viking" and event.target.name == "newWarrior" or event.other.name == "viking" and event.target.name == "flecha") then
-				if(attacking == 1 and event.target.name == "newWarrior") then
+				if(attacking == 1 and event.target.name == "newWarrior" and position == "R") then
+					score = score + 100
+					textScore.text = "Score: " .. score
+					event.target:removeSelf()
+				else	
+					event.target:removeSelf()
+					lifes = lifes -1
+					if(lifes < 2) then
+						life = display.newImageRect( "ui/1-life.png", 370, 130 )
+						life.x = display.contentCenterX - 700
+						life.y = display.contentCenterY - 420
+						uiGroup:insert(life)
+					else if(lifes < 3) then
+						life = display.newImageRect( "ui/2-lifes.png", 370, 130 )
+						life.x = display.contentCenterX - 700
+						life.y = display.contentCenterY - 420
+						uiGroup:insert(life)
+					end
+					end
+				end
+				if(lifes <= 0) then
+					life = display.newImageRect( "ui/0-life.png", 370, 130 )
+					life.x = display.contentCenterX - 700
+					life.y = display.contentCenterY - 420
+					uiGroup:insert(life)
+					composer.gotoScene("scene.game-over")	
+				end
+			else if(event.other.name == "viking" and event.target.name == "newWarrior2") then
+				if(attacking == 1 and event.target.name == "newWarrior2" and position == "L") then
 					score = score + 100
 					textScore.text = "Score: " .. score
 					event.target:removeSelf()
@@ -307,6 +335,7 @@ function scene:create( event )
 					composer.gotoScene("scene.game-over")	
 				end
 			end
+			end
 		end
 	end	
 
@@ -327,12 +356,15 @@ function scene:create( event )
 		
 		if ( whereFrom == 1 ) then
 			newWarrior:setLinearVelocity(-350, 0)
+			if(score >= 1000) then
+				newWarrior:setLinearVelocity(-200, 0)
+			end
 		end
 	end
 	criarInimigoLoop = timer.performWithDelay(1200, createWarrior, -1)
 
 	local function createWarrior2()
-		if(score >= 3000) then 
+		if(score >= 3500) then 
 			local newWarrior2 = display.newSprite(sheet, sequences)
 			newWarrior2:play()
 			newWarrior2.x = display.contentCenterX - 900
