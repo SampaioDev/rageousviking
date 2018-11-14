@@ -5,7 +5,7 @@ local mainGroup = display.newGroup()
 function scene:create( event )
 	local backgroundMusic = audio.loadStream( "soundtrack/menu.mp3" )
 	local buttonAudio = audio.loadStream( "soundtrack/start-button.mp3")
-	audio.play(backgroundMusic, {channel = 1, loops =-1})
+	audio.play(backgroundMusic, {channel = 4, loops =-1})
 	
 	local background = display.newImageRect( "ui/game-over.png", 1900, 1050 )
 	background.x = display.contentCenterX
@@ -63,7 +63,7 @@ function scene:hide( event )
 	local phase = event.phase
  
 	if ( phase == "will" ) then
-		audio.stop(1)
+		audio.stop(4)
 		display.remove(mainGroup)
 		--audio.pause()
 	elseif ( phase == "did" ) then

@@ -423,6 +423,9 @@ function scene:hide( event )
 		display.remove(uiGroup)
 		display.remove(mainGroup)
 		composer.removeScene("game")
+		if(stopAtk) then
+			timer.cancel(stopAtk)
+		end
 	elseif ( phase == "did" ) then
 		
 	end
