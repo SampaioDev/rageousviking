@@ -192,7 +192,7 @@ function scene:create( event )
 			viking:play()
 			viking.name = "viking"
 			mainGroup:insert(viking)
-			stopAtk = timer.performWithDelay(300, stopAttack)
+			stopAtk = timer.performWithDelay(500, stopAttack)
 		else if(position == "L") then
 			attacking = 1
 			local playerx = viking.x
@@ -208,7 +208,7 @@ function scene:create( event )
 			viking:play()
 			viking.name = "viking"
 			mainGroup:insert(viking)
-			stopAtk = timer.performWithDelay(300, stopAttack)
+			stopAtk = timer.performWithDelay(500, stopAttack)
 		end
 		end	
 	end
@@ -236,6 +236,7 @@ function scene:create( event )
 		viking:setSequence("idle")
 		viking:play()
 		viking.name = "viking"
+		mainGroup:insert(viking)
 		audio.play(steps, {channel = 2, loops =-1})
 		audio.setVolume(1, {channel = 2})
 		motionx = -speed;
@@ -256,6 +257,7 @@ function scene:create( event )
 		viking:setSequence("idle")
 		viking:play()
 		viking.name = "viking"
+		mainGroup:insert(viking)
 		audio.play(steps, {channel = 2, loops =-1})
 		audio.setVolume(1, {channel = 2})
 		motionx = speed;
@@ -414,6 +416,9 @@ function scene:hide( event )
  
 	if ( phase == "will" ) then
 		audio.pause()
+		if(stopAtk) then
+			timer.cancel(stopAtk)
+		end
 		timer.cancel(criarInimigoLoop)
 		timer.cancel(criarInimigoLoop2)
 		timer.cancel(movePlayerLoop)
@@ -423,9 +428,6 @@ function scene:hide( event )
 		display.remove(uiGroup)
 		display.remove(mainGroup)
 		composer.removeScene("game")
-		if(stopAtk) then
-			timer.cancel(stopAtk)
-		end
 	elseif ( phase == "did" ) then
 		
 	end
