@@ -1,7 +1,5 @@
 local composer = require("composer")
 local scene = composer.newScene()
-local backgroundMusic = audio.loadStream("soundtrack/epic.mp3")
-local steps = audio.loadStream("soundtrack/steps.mp3")
 local textScore
 local attacking
 local score = 0
@@ -25,8 +23,8 @@ speed = 10; -- Set Walking Speed
 system.activate( "multitouch" )
 
 function scene:create( event )
-	audio.play(backgroundMusic, {channel = 3, loops =-1})
-	audio.setVolume( 0.5, { channel = 3 } )
+	local backgroundMusic = audio.loadStream("soundtrack/epic.mp3")
+	audio.play(backgroundMusic, {channel = 2, loops =-1})
 	
 	local count = 0
 
@@ -111,14 +109,14 @@ function scene:create( event )
 	life.y = display.contentCenterY - 420
 	uiGroup:insert(life)
 
-	local pause = display.newImageRect( "ui/pause.png", 100, 100 )
-	pause.x = display.contentCenterX + 800
-	pause.y = display.contentCenterY - 420
-	uiGroup:insert(pause)
+	-- local pause = display.newImageRect( "ui/pause.png", 100, 100 )
+	-- pause.x = display.contentCenterX + 800
+	-- pause.y = display.contentCenterY - 420
+	-- uiGroup:insert(pause)
 
 	local sound = display.newImageRect( "ui/soundon.png", 100, 100 )
-	sound.x = display.contentCenterX + 800
-	sound.y = display.contentCenterY - 300
+	sound.x = display.contentCenterX + 820
+	sound.y = display.contentCenterY - 430
 	uiGroup:insert(sound)
 
 	local status = "ON"
@@ -237,8 +235,6 @@ function scene:create( event )
 		viking:play()
 		viking.name = "viking"
 		mainGroup:insert(viking)
-		audio.play(steps, {channel = 2, loops =-1})
-		audio.setVolume(1, {channel = 2})
 		motionx = -speed;
 	end
 	left:addEventListener("touch",left)
@@ -258,8 +254,6 @@ function scene:create( event )
 		viking:play()
 		viking.name = "viking"
 		mainGroup:insert(viking)
-		audio.play(steps, {channel = 2, loops =-1})
-		audio.setVolume(1, {channel = 2})
 		motionx = speed;
 	end
 	right:addEventListener("touch",right)
@@ -270,8 +264,7 @@ function scene:create( event )
 	movePlayerLoop = timer.performWithDelay(1, movePlayer, -1)
 
 	local function stop (event)
-		if event.phase =="ended" then
-			audio.stop(2)			
+		if event.phase =="ended" then		
 			motionx = 0;
 		end
 	end
@@ -359,14 +352,14 @@ function scene:create( event )
 		if ( whereFrom == 1 ) then
 			newWarrior:setLinearVelocity(-350, 0)
 			if(score >= 1000) then
-				newWarrior:setLinearVelocity(-200, 0)
+				newWarrior:setLinearVelocity(-300, 0)
 			end
 		end
 	end
 	criarInimigoLoop = timer.performWithDelay(1200, createWarrior, -1)
 
 	local function createWarrior2()
-		if(score >= 3500) then 
+		if(score >= 2000) then 
 			local newWarrior2 = display.newSprite(sheet, sequences)
 			newWarrior2:play()
 			newWarrior2.x = display.contentCenterX - 900
@@ -382,14 +375,30 @@ function scene:create( event )
 			local whereFrom = math.random(1)
 			
 			if ( whereFrom == 1 ) then
-				newWarrior2:setLinearVelocity(250, 0)
+				newWarrior2:setLinearVelocity(300, 0)
 			end
 		end
 	end
-	criarInimigoLoop2 = timer.performWithDelay(1800, createWarrior2, -1)
+	criarInimigoLoop2 = timer.performWithDelay(2000, createWarrior2, -1)
 
 	local function createArrow()
-		if(score >= 1000) then
+		if(score >= 1000 and score <= 2000) then
+			local flecha = display.newImageRect("ui/flecha.png", 30, 140)
+			flecha.x = math.random(_W)  
+			flecha.y = display.contentCenterY - 440
+			flecha.name = "flecha" 
+			mainGroup:insert(flecha)
+			table.insert( arrowTable, flecha)
+			physics.addBody( flecha, "dynamic", {filter = collisionFilter1} )
+			flecha:addEventListener( "collision", onCollision )
+			
+			local whereFrom = math.random(1)
+			
+			if ( whereFrom == 1 ) then
+				flecha:setLinearVelocity(0, 400)
+			end
+		end
+		if(score >= 3000) then
 			local flecha = display.newImageRect("ui/flecha.png", 30, 140)
 			flecha.x = math.random(_W)  
 			flecha.y = display.contentCenterY - 440
@@ -415,7 +424,7 @@ function scene:hide( event )
 	local phase = event.phase
  
 	if ( phase == "will" ) then
-		audio.pause()
+		audio.stop(2)
 		if(stopAtk) then
 			timer.cancel(stopAtk)
 		end
