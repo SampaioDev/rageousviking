@@ -22,12 +22,12 @@ function scene:create( event )
     mainGroup:insert(jogar)
 
     local function playAgain()
-        composer.gotoScene("scene.game")
+        composer.gotoScene("scene.game", { time=800, effect="crossFade" })
     end
     jogar:addEventListener( "tap", playAgain)
 
 	local function goToMenu()
-        composer.gotoScene("scene.menu")
+        composer.gotoScene("scene.menu", { time=800, effect="crossFade" })
     end
     voltar:addEventListener( "tap", goToMenu)
 

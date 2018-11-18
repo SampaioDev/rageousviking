@@ -110,7 +110,7 @@ function scene:create( event )
 	buttonPulseLoop = timer.performWithDelay(20, buttonPulse, -1)
 
 	local function startGame()
-		composer.gotoScene("scene.game")
+		composer.gotoScene("scene.game", { time=800, effect="crossFade" })
 		audio.play(buttonAudio)
 	end
 	start:addEventListener( "tap", startGame )

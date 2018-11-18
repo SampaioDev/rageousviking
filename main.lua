@@ -36,4 +36,6 @@ if isSimulator then
 	Runtime:addEventListener( "key", debugKeys )
 end
 
+
+
 composer.gotoScene("scene.menu")

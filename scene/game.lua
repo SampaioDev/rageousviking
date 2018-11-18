@@ -23,6 +23,7 @@ speed = 10; -- Set Walking Speed
 system.activate( "multitouch" )
 
 function scene:create( event )
+
 	local backgroundMusic = audio.loadStream("soundtrack/epic.mp3")
 	audio.play(backgroundMusic, {channel = 2, loops =-1})
 	
@@ -123,14 +124,14 @@ function scene:create( event )
 	local function toggleSound()
 		if(status == "ON") then
 			sound = display.newImageRect( "ui/soundoff.png", 100, 100 )
-			sound.x = display.contentCenterX + 800
-			sound.y = display.contentCenterY - 300
+			sound.x = display.contentCenterX + 820
+			sound.y = display.contentCenterY - 430
 			audio.pause()
 			status = "OFF"	
 		else
 			sound = display.newImageRect( "ui/soundon.png", 100, 100 )
-			sound.x = display.contentCenterX + 800
-			sound.y = display.contentCenterY - 300
+			sound.x = display.contentCenterX + 820
+			sound.y = display.contentCenterY - 430
 			audio.resume()
 			status = "ON"	
 		end	
@@ -327,7 +328,8 @@ function scene:create( event )
 					life.x = display.contentCenterX - 700
 					life.y = display.contentCenterY - 420
 					uiGroup:insert(life)
-					composer.gotoScene("scene.game-over")	
+					composer.setVariable( "finalScore", score )
+					composer.gotoScene("scene.game-over" )	
 				end
 			end
 			end
@@ -449,7 +451,7 @@ function scene:show( event )
  
 	if ( phase == "will" ) then
 		composer.removeScene("scene.menu")
-		composer.removeScene("scene.game-over")
+		composer.removeScene("scene.highscore")
 		-- Code here runs when the scene is still off screen (but is about to come on screen)
  
 	elseif ( phase == "did" ) then
