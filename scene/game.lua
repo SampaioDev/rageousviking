@@ -1,10 +1,12 @@
 local composer = require("composer")
+local paused = false
 local scene = composer.newScene()
 local textScore
 local attacking
 local score = 0
 local warriorTable = {}
 local arrowTable = {}
+local waveTable = {}
 local lifes = 3
 local backgroundGroup = display.newGroup()
 local mainGroup = display.newGroup()
@@ -43,17 +45,17 @@ function scene:create( event )
 	backgroundGroup:insert(background)
 
 	local sheetOptions1 = {
-		width =  196.33, 
-		height = 200, 
-		numFrames = 36
+		width =  144, 
+		height = 161, 
+		numFrames = 5
 	}
-	local sheet = graphics.newImageSheet("ui/BronzeKnight.png", sheetOptions1)
+	local sheet = graphics.newImageSheet("ui/enemie-sprite.png", sheetOptions1)
 	local sequences = {
 		{
 			name = "attacking",
-			start = 3,
-			count = 25,
-			time = 800,
+			start = 1,
+			count = 5,
+			time = 400,
 			loopCount = 0,	
 			speed = speed - 20
 			
@@ -83,6 +85,24 @@ function scene:create( event )
 			speed = speed - 20
 		}
 	}
+
+	local sheetOptions3 = {
+		width =  99, 
+		height = 161, 
+		numFrames = 8
+	}
+
+	local vikingWalking = graphics.newImageSheet("ui/viking-walking.png", sheetOptions3)
+	local sequences3 = {
+		{
+			name = "walking",
+			start = 1,
+			count = 8,
+			time = 400,
+			loopCount = 0
+		}
+	}
+
 	textScore = display.newText("Score:" ..score , 100, 200, native.systemFont, 100 )
 	textScore:setFillColor( 1	, 1, 1 )
 	textScore.x = display.contentCenterX
@@ -110,14 +130,20 @@ function scene:create( event )
 	life.y = display.contentCenterY - 420
 	uiGroup:insert(life)
 
-	-- local pause = display.newImageRect( "ui/pause.png", 100, 100 )
-	-- pause.x = display.contentCenterX + 800
-	-- pause.y = display.contentCenterY - 420
-	-- uiGroup:insert(pause)
+	local pause = display.newImageRect( "ui/pause.png", 100, 100 )
+	pause.x = display.contentCenterX + 820
+	pause.y = display.contentCenterY - 430
+	uiGroup:insert(pause)
+
+	local resume = display.newImageRect( "ui/resume.png", 100, 100 )
+	resume.x = display.contentCenterX + 820
+	resume.y = display.contentCenterY - 430
+	resume.isVisible = false
+	uiGroup:insert(resume)
 
 	local sound = display.newImageRect( "ui/soundon.png", 100, 100 )
 	sound.x = display.contentCenterX + 820
-	sound.y = display.contentCenterY - 430
+	sound.y = display.contentCenterY - 300
 	uiGroup:insert(sound)
 
 	local status = "ON"
@@ -125,13 +151,15 @@ function scene:create( event )
 		if(status == "ON") then
 			sound = display.newImageRect( "ui/soundoff.png", 100, 100 )
 			sound.x = display.contentCenterX + 820
-			sound.y = display.contentCenterY - 430
+			sound.y = display.contentCenterY - 300
+			uiGroup:insert(sound)
 			audio.pause()
 			status = "OFF"	
 		else
 			sound = display.newImageRect( "ui/soundon.png", 100, 100 )
 			sound.x = display.contentCenterX + 820
-			sound.y = display.contentCenterY - 430
+			sound.y = display.contentCenterY - 300
+			uiGroup:insert(sound)
 			audio.resume()
 			status = "ON"	
 		end	
@@ -139,39 +167,41 @@ function scene:create( event )
 	sound:addEventListener( "tap", toggleSound)
 
 	local function stopAttack()
-		if(position == "R") then
-			attacking = 0
-			local playerx = viking.x
-			local playery = viking.y
-			viking:removeSelf()
-			viking = display.newSprite(vikingSheet, sequences2)
-			viking.x = playerx
-			viking.y = playery
-			physics.addBody( viking, "static", { radius=70} )
-			viking.xScale = 1.4
-			viking.yScale = 1.4
-			viking:setSequence("idle")
-			viking:play()
-			viking.name = "viking"
-			mainGroup:insert(viking)
-			physics.addBody(viking, "static", { radius=70} )
-		else if(position == "L") then
-			attacking = 0
-			local playerx = viking.x
-			local playery = viking.y
-			viking:removeSelf()
-			viking = display.newSprite(vikingSheet, sequences2)
-			viking.x = playerx
-			viking.y = playery
-			physics.addBody( viking, "static", { radius=70} )
-			viking.xScale = -1.4
-			viking.yScale = 1.4
-			viking:setSequence("idle")
-			viking:play()
-			viking.name = "viking"
-			mainGroup:insert(viking)
-			physics.addBody(viking, "static", { radius=70} )
-		end
+		if(paused == false) then
+			if(position == "R") then
+				attacking = 0
+				local playerx = viking.x
+				local playery = viking.y
+				viking:removeSelf()
+				viking = display.newSprite(vikingSheet, sequences2)
+				viking.x = playerx
+				viking.y = playery
+				physics.addBody( viking, "static", { radius=70} )
+				viking.xScale = 1.4
+				viking.yScale = 1.4
+				viking:setSequence("idle")
+				viking:play()
+				viking.name = "viking"
+				mainGroup:insert(viking)
+				physics.addBody(viking, "static", { radius=70} )
+			else if(position == "L") then
+				attacking = 0
+				local playerx = viking.x
+				local playery = viking.y
+				viking:removeSelf()
+				viking = display.newSprite(vikingSheet, sequences2)
+				viking.x = playerx
+				viking.y = playery
+				physics.addBody( viking, "static", { radius=70} )
+				viking.xScale = -1.4
+				viking.yScale = 1.4
+				viking:setSequence("idle")
+				viking:play()
+				viking.name = "viking"
+				mainGroup:insert(viking)
+				physics.addBody(viking, "static", { radius=70} )
+			end
+			end
 		end
 	end
 
@@ -222,40 +252,44 @@ function scene:create( event )
 	uiGroup:insert(right)
 
 	function left:touch()
-		position = "L"
-		local playerx = viking.x
-		local playery = viking.y
-		viking:removeSelf()
-		viking = display.newSprite(vikingSheet, sequences2)
-		viking.x = playerx
-		viking.y = playery
-		physics.addBody( viking, "static", { radius=70} )
-		viking.xScale = -1.4
-		viking.yScale = 1.4
-		viking:setSequence("idle")
-		viking:play()
-		viking.name = "viking"
-		mainGroup:insert(viking)
-		motionx = -speed;
+		if(paused == false) then 
+			position = "L"
+			local playerx = viking.x
+			local playery = viking.y
+			viking:removeSelf()
+			viking = display.newSprite(vikingSheet, sequences2)
+			viking.x = playerx
+			viking.y = playery
+			physics.addBody( viking, "static", { radius=70} )
+			viking.xScale = -1.4
+			viking.yScale = 1.4
+			viking:setSequence("idle")
+			viking:play()
+			viking.name = "viking"
+			mainGroup:insert(viking)
+			motionx = -speed;
+		end
 	end
 	left:addEventListener("touch",left)
 
 	function right:touch()
-		position = "R"
-		local playerx = viking.x
-		local playery = viking.y
-		viking:removeSelf()
-		viking = display.newSprite(vikingSheet, sequences2)
-		viking.x = playerx
-		viking.y = playery
-		physics.addBody( viking, "static", { radius=70} )
-		viking.xScale = 1.4
-		viking.yScale = 1.4
-		viking:setSequence("idle")
-		viking:play()
-		viking.name = "viking"
-		mainGroup:insert(viking)
-		motionx = speed;
+		if(paused == false) then
+			position = "R"
+			local playerx = viking.x
+			local playery = viking.y
+			viking:removeSelf()
+			viking = display.newSprite(vikingSheet, sequences2)
+			viking.x = playerx
+			viking.y = playery
+			physics.addBody( viking, "static", { radius=70} )
+			viking.xScale = 1.4
+			viking.yScale = 1.4
+			viking:setSequence("idle")
+			viking:play()
+			viking.name = "viking"
+			mainGroup:insert(viking)
+			motionx = speed;
+		end
 	end
 	right:addEventListener("touch",right)
 
@@ -279,36 +313,20 @@ function scene:create( event )
 					score = score + 100
 					textScore.text = "Score: " .. score
 					event.target:removeSelf()
+					for i = #warriorTable, 1, -1 do
+						if ( warriorTable[i] == event.target or warriorTable[i] == event.other ) then
+							table.remove( warriorTable, i )
+							break
+						end
+					end
 				else	
 					event.target:removeSelf()
-					lifes = lifes -1
-					if(lifes < 2) then
-						life = display.newImageRect( "ui/1-life.png", 370, 130 )
-						life.x = display.contentCenterX - 700
-						life.y = display.contentCenterY - 420
-						uiGroup:insert(life)
-					else if(lifes < 3) then
-						life = display.newImageRect( "ui/2-lifes.png", 370, 130 )
-						life.x = display.contentCenterX - 700
-						life.y = display.contentCenterY - 420
-						uiGroup:insert(life)
+					for i = #warriorTable, 1, -1 do
+						if ( warriorTable[i] == event.target or warriorTable[i] == event.other ) then
+							table.remove( warriorTable, i )
+							break
+						end
 					end
-					end
-				end
-				if(lifes <= 0) then
-					life = display.newImageRect( "ui/0-life.png", 370, 130 )
-					life.x = display.contentCenterX - 700
-					life.y = display.contentCenterY - 420
-					uiGroup:insert(life)
-					composer.gotoScene("scene.game-over")	
-				end
-			else if(event.other.name == "viking" and event.target.name == "newWarrior2") then
-				if(attacking == 1 and event.target.name == "newWarrior2" and position == "L") then
-					score = score + 100
-					textScore.text = "Score: " .. score
-					event.target:removeSelf()
-				else	
-					event.target:removeSelf()
 					lifes = lifes -1
 					if(lifes < 2) then
 						life = display.newImageRect( "ui/1-life.png", 370, 130 )
@@ -329,7 +347,48 @@ function scene:create( event )
 					life.y = display.contentCenterY - 420
 					uiGroup:insert(life)
 					composer.setVariable( "finalScore", score )
-					composer.gotoScene("scene.game-over" )	
+					composer.gotoScene("scene.highscore")	
+				end
+			else if(event.other.name == "viking" and event.target.name == "newWarrior2") then
+				if(attacking == 1 and event.target.name == "newWarrior2" and position == "L") then
+					score = score + 100
+					textScore.text = "Score: " .. score
+					event.target:removeSelf()
+					for i = #warriorTable, 1, -1 do
+						if ( warriorTable[i] == event.target or warriorTable[i] == event.other ) then
+							table.remove( warriorTable, i )
+							break
+						end
+					end
+				else	
+					event.target:removeSelf()
+					for i = #warriorTable, 1, -1 do
+						if ( warriorTable[i] == event.target or warriorTable[i] == event.other ) then
+							table.remove( warriorTable, i )
+							break
+						end
+					end
+					lifes = lifes -1
+					if(lifes < 2) then
+						life = display.newImageRect( "ui/1-life.png", 370, 130 )
+						life.x = display.contentCenterX - 700
+						life.y = display.contentCenterY - 420
+						uiGroup:insert(life)
+					else if(lifes < 3) then
+						life = display.newImageRect( "ui/2-lifes.png", 370, 130 )
+						life.x = display.contentCenterX - 700
+						life.y = display.contentCenterY - 420
+						uiGroup:insert(life)
+					end
+					end
+				end
+				if(lifes <= 0) then
+					life = display.newImageRect( "ui/0-life.png", 370, 130 )
+					life.x = display.contentCenterX - 700
+					life.y = display.contentCenterY - 420
+					uiGroup:insert(life)
+					composer.setVariable( "finalScore", score )
+					composer.gotoScene("scene.highscore" )	
 				end
 			end
 			end
@@ -337,12 +396,12 @@ function scene:create( event )
 	end	
 
 	local function createWarrior()
-		local newWarrior = display.newSprite(sheet, sequences)
+		newWarrior = display.newSprite(sheet, sequences)
 		newWarrior:play()
 		newWarrior.x = display.contentCenterX + 900
-		newWarrior.y = display.contentCenterY + 180
-		newWarrior.xScale = 1.1
-		newWarrior.yScale = 1.1
+		newWarrior.y = display.contentCenterY + 170
+		newWarrior.xScale = -1.1
+		newWarrior.yScale = 1.3
 		table.insert( warriorTable, newWarrior)
 		physics.addBody( newWarrior, "dynamic", { radius=70, filter = collisionFilter1} )
 		newWarrior.name = "newWarrior"
@@ -362,12 +421,12 @@ function scene:create( event )
 
 	local function createWarrior2()
 		if(score >= 2000) then 
-			local newWarrior2 = display.newSprite(sheet, sequences)
+			newWarrior2 = display.newSprite(sheet, sequences)
 			newWarrior2:play()
 			newWarrior2.x = display.contentCenterX - 900
-			newWarrior2.y = display.contentCenterY + 180
-			newWarrior2.xScale = -1.1
-			newWarrior2.yScale = 1.1
+			newWarrior2.y = display.contentCenterY + 170
+			newWarrior2.xScale = 1.1
+			newWarrior2.yScale = 1.3
 			table.insert( warriorTable, newWarrior2)
 			physics.addBody( newWarrior2, "dynamic", { radius=70, filter = collisionFilter1} )
 			newWarrior2.name = "newWarrior2"
@@ -418,7 +477,117 @@ function scene:create( event )
 		end
 	end
 	createArrowLoop = timer.performWithDelay(400, createArrow, -1)
+
+	local function createWave()
+		wave = display.newImageRect("ui/wave.png", 140, 40)
+		wave.x = display.contentCenterX + 890 
+		wave.y = display.contentCenterY + 40
+		wave.name = "wave" 
+		mainGroup:insert(wave)
+		table.insert( waveTable, wave)
+		physics.addBody( wave, "dynamic", {filter = collisionFilter1} )
+		local count = math.random(1)
+		if ( count == 1) then
+			wave:setLinearVelocity(-280, 0)
+		end
+	end
+	createWaveLoop = timer.performWithDelay(1300, createWave, -1)
+
+	local function createWave2()
+		wave = display.newImageRect("ui/wave.png", 140, 40)
+		wave.x = display.contentCenterX + 880 
+		wave.y = display.contentCenterY - 15 
+		wave.name = "wave" 
+		mainGroup:insert(wave)
+		table.insert( waveTable, wave)
+		physics.addBody( wave, "dynamic", {filter = collisionFilter1} )
+		local count = math.random(1)
+		if ( count == 1) then
+			wave:setLinearVelocity(-200, 0)
+		end
+	end
+	createWaveLoop2 = timer.performWithDelay(2000, createWave2, -1)
+
+	local function createCloud()
+		cloud = display.newImageRect("ui/cloud.png", 250, 100)
+		cloud.x = display.contentCenterX + 880 
+		cloud.y = display.contentCenterY -460 
+		cloud.name = "cloud" 
+		uiGroup:insert(cloud)
+		table.insert( waveTable, cloud)
+		physics.addBody( cloud, "dynamic", {filter = collisionFilter1} )
+		local count = math.random(1)
+		if ( count == 1) then
+			cloud:setLinearVelocity(-200, 0)
+		end
+	end
+	createCloudLoop = timer.performWithDelay(3500, createCloud, -1)
+
+	local function createCloud2()
+		cloud = display.newImageRect("ui/cloud.png", 250, 100)
+		cloud.x = display.contentCenterX + 880 
+		cloud.y = display.contentCenterY - 360 
+		cloud.name = "cloud" 
+		uiGroup:insert(cloud)
+		table.insert( waveTable, cloud)
+		physics.addBody( cloud, "dynamic", {filter = collisionFilter1} )
+		local count = math.random(1)
+		if ( count == 1) then
+			cloud:setLinearVelocity(-220, 0)
+		end
+	end
+	createCloudLoop2 = timer.performWithDelay(2300, createCloud2, -1)
 		
+	local function pauseGame()
+		if (paused == false) then
+			physics.pause()
+			transition.pause()
+			pause.isVisible = false
+			resume.isVisible = true
+			for i = #warriorTable, 1, -1 do
+				warriorTable[i]:pause()
+			end
+			if(newWarrior2) then
+				for i = #warriorTable, 1, -1 do
+					warriorTable[i]:pause()
+				end
+			end
+			timer.pause(criarInimigoLoop)
+			timer.pause(criarInimigoLoop2)
+			timer.pause(movePlayerLoop)
+			timer.pause(createArrowLoop)
+			timer.pause(createWaveLoop)
+			timer.pause(createWaveLoop2)
+			timer.pause(createCloudLoop)
+			timer.pause(createCloudLoop2)			
+			paused = true
+		else
+			physics.start()
+			transition.resume()
+			pause.isVisible = true
+			resume.isVisible = false
+			for i = #warriorTable, 1, -1 do
+				warriorTable[i]:play()
+			end
+			if(newWarrior2) then
+				for i = #warriorTable, 1, -1 do
+					warriorTable[i]:pause()
+				end
+			end	
+			timer.resume(criarInimigoLoop)
+			timer.resume(criarInimigoLoop2)
+			timer.resume(movePlayerLoop)
+			timer.resume(createArrowLoop)
+			timer.resume(createWaveLoop)
+			timer.resume(createWaveLoop2)
+			timer.resume(createCloudLoop)
+			timer.resume(createCloudLoop2)
+			paused = false
+		end	
+	end
+
+	resume:addEventListener( "tap", pauseGame )
+	pause:addEventListener( "tap", pauseGame )
 end
 
 function scene:hide( event )
@@ -434,6 +603,10 @@ function scene:hide( event )
 		timer.cancel(criarInimigoLoop2)
 		timer.cancel(movePlayerLoop)
 		timer.cancel(createArrowLoop)
+		timer.cancel(createWaveLoop)
+		timer.cancel(createWaveLoop2)
+		timer.cancel(createCloudLoop)
+		timer.cancel(createCloudLoop2)
 		Runtime:removeEventListener("touch", stop )
 		display.remove(backgroundGroup)
 		display.remove(uiGroup)

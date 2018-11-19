@@ -1,7 +1,6 @@
 local composer = require( "composer" )
-
 local scene = composer.newScene()
-
+local mainGroup = display.newGroup()
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -57,10 +56,31 @@ end
 
 -- create()
 function scene:create( event )
-
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
+	local backgroundMusic = audio.loadStream( "soundtrack/gameover.ogg" )
+	audio.play(backgroundMusic, {channel = 3, loops =-1})
 
+	local voltar = display.newImageRect( "ui/voltar.png", 540, 220 )
+	voltar.x = display.contentCenterX + 400
+	voltar.y = display.contentCenterY + 200 
+    mainGroup:insert(voltar)
+
+	local jogar = display.newImageRect( "ui/start-button.png", 500, 110 )
+	jogar.x = display.contentCenterX - 400
+	jogar.y = display.contentCenterY + 265
+    mainGroup:insert(jogar)
+
+    local function playAgain()
+        composer.gotoScene("scene.game", { time=800, effect="crossFade" })
+    end
+    jogar:addEventListener( "tap", playAgain)
+
+	local function goToMenu()
+        composer.gotoScene("scene.menu", { time=800, effect="crossFade" })
+    end
+	voltar:addEventListener( "tap", goToMenu)
+	
     -- Load the previous scores
     loadScores()
 
@@ -79,26 +99,45 @@ function scene:create( event )
 
     local background = display.newImageRect( sceneGroup, "ui/game-over.png", 1900, 1050 )
     background.x = display.contentCenterX
-    background.y = display.contentCenterY
-
-    local highScoresHeader = display.newText( sceneGroup, "High Scores", display.contentCenterX + 150, 170, native.systemFont, 60 )
-
-    for i = 1, 4 do
+	background.y = display.contentCenterY
+	
+	local highScoresHeader = display.newText( sceneGroup, "High Scores", display.contentCenterX, 240, native.systemFont, 60 )
+	
+	for i = 1, 4 do
         if ( scoresTable[i] ) then
-            local yPos = 170 + ( i * 100 )
+            local yPos = 220 + ( i * 100 )
 
-            local rankNum = display.newText( sceneGroup, i .. ") ", display.contentCenterX+100, yPos, native.systemFont, 50 )
-            rankNum:setFillColor( 0.8 )
+            local rankNum = display.newText( sceneGroup, i .. ") ", display.contentCenterX - 30 , yPos, native.systemFont, 60 )
+            rankNum:setFillColor( 0.8, 2 )
             rankNum.anchorX = 1
  
-            local thisScore = display.newText( sceneGroup, scoresTable[i], display.contentCenterX+100, yPos, native.systemFont, 50 )
+            local thisScore = display.newText( sceneGroup, scoresTable[i], display.contentCenterX - 30, yPos, native.systemFont, 60 )
             thisScore.anchorX = 0
         end
     end
+	local sound = display.newImageRect( "ui/soundon.png", 100, 100 )
+	sound.x = display.contentCenterX + 800
+	sound.y = display.contentCenterY - 420
+	mainGroup:insert(sound)
 
-    local menuButton = display.newText( sceneGroup, "Menu", display.contentWidth - 50, display.contentCenterY + 200,  native.systemFont, 70 )
-    menuButton:setFillColor( 0.75, 0.78, 1 )
-    menuButton:addEventListener( "tap", gotoMenu )
+	local status = "ON"
+	local function toggleSound()
+		if(status == "ON") then
+			sound = display.newImageRect( "ui/soundoff.png", 100, 100 )
+			sound.x = display.contentCenterX + 800
+			sound.y = display.contentCenterY - 420
+			audio.pause()
+			status = "OFF"	
+		else
+			sound = display.newImageRect( "ui/soundon.png", 100, 100 )
+			sound.x = display.contentCenterX + 800
+			sound.y = display.contentCenterY - 420
+			audio.resume()
+			status = "ON"	
+		end	
+	end
+	sound:addEventListener( "tap", toggleSound)
+
 end
 
 
@@ -110,7 +149,8 @@ function scene:show( event )
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is still off screen (but is about to come on screen)
-
+		composer.removeScene("scene.game")
+		composer.removeScene("scene.menu")
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
 
@@ -126,7 +166,8 @@ function scene:hide( event )
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is on screen (but is about to go off screen)
-
+		audio.stop(3)
+		display.remove(mainGroup)
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
 		composer.removeScene( "highscores" )

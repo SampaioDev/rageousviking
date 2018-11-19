@@ -8,6 +8,18 @@
 
 local composer = require("composer")
 
+function timer:pauseAllTimers()
+	for i=1, table.maxn(group), 1 do
+		timer.pause(group[i])
+	end
+end
+
+function timer:resumeAllTimers()
+	for i=1, table.maxn(group), 1 do
+		timer.resume(group[i])
+	end
+end
+
 local isSimulator = "simulator" == system.getInfo( "environment" )
 local isMobile = ( "ios" == system.getInfo("platform") ) or ( "android" == system.getInfo("platform") )
 system.activate( "multitouch" )
